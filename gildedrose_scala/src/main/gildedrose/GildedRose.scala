@@ -1,75 +1,59 @@
 package gildedrose
 
-class Item (n: String, s: Int, q: Int) {
-  val name: String = n
-  var sellIn: Int = s
-  var quality: Int = q
+object Item {
+  val NORMAL = "normal"
+  val SULFURA = "Sulfuras, Hand of Ragnaros"
+  val AGED_BRIE = "Aged Brie"
+  val BACKSTAGE = "Backstage passes to a TAFKAL80ETC concert"
+}
 
-  def updateQuality() {
+class Item(val name: String, var sellIn: Int, var quality: Int)
 
-    if (!this.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-      if (this.quality > 0) {
-        if (!this.name.equals("Sulfuras, Hand of Ragnaros")) {
-          this.quality = this.quality - 1
-        }
-      }
-    } else {
-      if (this.quality < 50) {
-        this.quality = this.quality + 1
+object Update{
+  def normal(item: Item) = {
+    item.sellIn -= 1
 
-        if (this.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-          if (this.sellIn < 11) {
-            if (this.quality < 50) {
-              this.quality = this.quality + 1
-            }
-          }
+    if (item.quality > 0) item.quality -= 1
 
-          if (this.sellIn < 6) {
-            if (this.quality < 50) {
-              this.quality = this.quality + 1
-            }
-          }
-        }
-      }
+    if (item.sellIn < 0 && item.quality > 0) item.quality -= 1
+  }
+
+  def sulfura(item: Item) = {
+    item.quality = 80
+  }
+
+  def agedBrie(item: Item) = {
+    require(item.quality <= 50, "quality cannot be greater than 50")
+    item.sellIn -= 1
+
+    if (item.quality < 50) item.quality += 1
+  }
+
+  def backstage(item: Item) = {
+    require(item.quality <= 50, "quality cannot be greater than 50")
+    item.sellIn -= 1
+
+    if(item.quality < 50) {
+      item.quality += 1
+      if(item.sellIn < 11) item.quality += 1
+      if(item.sellIn < 6) item.quality += 1
+      if(item.sellIn < 0) item.quality = 0
     }
 
-    if (!this.name.equals("Sulfuras, Hand of Ragnaros")) {
-      this.sellIn = this.sellIn - 1
-    }
-
-
-    if (this.sellIn < 0) {
-        if (!this.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-          if (this.quality > 0) {
-            if (!this.name.equals("Sulfuras, Hand of Ragnaros")) {
-              this.quality = this.quality - 1
-            }
-          }
-        } else {
-          this.quality = this.quality - this.quality
-        }
-    }
-
-
+    if(item.quality > 50) item.quality = 50
   }
 }
 
-case class AgedBrie(s: Int, q: Int) extends Item("Aged Brie", s, q) {
-  require(q < 50, "quality cannot be greater than 50")
-
-  override def updateQuality() {
-    this.sellIn -= 1
-    if(this.quality < 50) {
-      this.quality = this.quality + 1
-    }
-  }
-}
 
 class GildedRose(val items: Array[Item]) {
 
   def updateQuality() {
-    for (i <- items) {
-      i.updateQuality()
-    }
+    items.foreach(item => item.name match {
+      case Item.AGED_BRIE => Update agedBrie item
+      case Item.BACKSTAGE => Update backstage item
+      case Item.NORMAL => Update normal item
+      case Item.SULFURA => Update sulfura item
+      case _ => Update normal item
+    })
   }
 }

@@ -1,6 +1,6 @@
 package giledrose
 
-import gildedrose.{AgedBrie, GildedRose, Item}
+import gildedrose._
 import org.scalatest.FunSuite
 
 class GildedRoseTest extends FunSuite{
@@ -30,7 +30,7 @@ class GildedRoseTest extends FunSuite{
   }
 
   test("The quality of a normal item is never negative") {
-    item = new Item("Normal", 2, 1)
+    item = new Item(Item.NORMAL, 2, 1)
     gildedRose = new GildedRose(Array(item))
 
     gildedRose.updateQuality()
@@ -43,7 +43,7 @@ class GildedRoseTest extends FunSuite{
   }
 
   test("Aged Brie sellIn date should decrease") {
-    item = new AgedBrie(10, 5)
+    item = new Item(Item.AGED_BRIE, 10, 5)
 
     new GildedRose(Array(item)).updateQuality()
 
@@ -51,7 +51,7 @@ class GildedRoseTest extends FunSuite{
   }
 
   test("Aged Brie quality should increase") {
-    item = new AgedBrie(10, 5)
+    item = new Item(Item.AGED_BRIE, 10, 5)
 
     new GildedRose(Array(item)).updateQuality()
 
@@ -59,7 +59,7 @@ class GildedRoseTest extends FunSuite{
   }
 
   test("Aged Brie quality should never be more than 50") {
-    item = new AgedBrie(10, 49)
+    item = new Item(Item.AGED_BRIE, 10, 49)
 
     val gildedRose = new GildedRose(Array(item))
 
@@ -72,50 +72,41 @@ class GildedRoseTest extends FunSuite{
 
   test("Aged Brie quality can never pass in value greater than 50") {
     intercept[IllegalArgumentException] {
-      new AgedBrie(10, 51)
+      item = new Item(Item.AGED_BRIE, 10, 51)
+      new GildedRose(Array(item)).updateQuality()
     }
   }
 
   test("Backstage sellIn date should decrease") {
-    val name = "Backstage passes to a TAFKAL80ETC concert"
-
-    item = new Item(name, 15, 5)
+    item = new Item(Item.BACKSTAGE, 15, 5)
     new GildedRose(Array(item)).updateQuality()
 
     assert(item.sellIn == 14)
   }
 
   test("Backstage quality should increase by 1 for sellin date > 10") {
-    val name = "Backstage passes to a TAFKAL80ETC concert"
-
-    item = new Item(name, 15, 5)
+    item = new Item(Item.BACKSTAGE, 15, 5)
     new GildedRose(Array(item)).updateQuality()
 
     assert(item.quality == 6)
   }
 
   test("Backstage quality should increase by 2 for sellin date <= 10") {
-    val name = "Backstage passes to a TAFKAL80ETC concert"
-
-    item = new Item(name, 10, 5)
+    item = new Item(Item.BACKSTAGE, 10, 5)
     new GildedRose(Array(item)).updateQuality()
 
     assert(item.quality == 7)
   }
 
   test("Backstage quality should increase by 3 for sellin date <= 5") {
-    val name = "Backstage passes to a TAFKAL80ETC concert"
-
-    item = new Item(name, 5, 5)
+    item = new Item(Item.BACKSTAGE, 5, 5)
     new GildedRose(Array(item)).updateQuality()
 
     assert(item.quality == 8)
   }
 
   test("Backstage quality should be 0 for sellin date <= 0") {
-    val name = "Backstage passes to a TAFKAL80ETC concert"
-
-    item = new Item(name, 1, 5)
+    item = new Item(Item.BACKSTAGE, 1, 5)
     gildedRose = new GildedRose(Array(item))
     gildedRose.updateQuality()
     assert(item.quality == 8)
@@ -126,7 +117,7 @@ class GildedRoseTest extends FunSuite{
 
   test("Backstage quality should never be more than 50") {
 
-    item = new Item("Backstage passes to a TAFKAL80ETC concert", 10, 49)
+    item = new Item(Item.BACKSTAGE, 10, 49)
 
     val gildedRose = new GildedRose(Array(item))
 
@@ -137,14 +128,19 @@ class GildedRoseTest extends FunSuite{
     assert(item.quality == 50)
   }
 
-  test("Sulfuras, Hand of Ragnaros sellIn and quality should stay the same") {
-    val name = "Sulfuras, Hand of Ragnaros"
+  test("Backstage quality can never pass in value greater than 50") {
+    intercept[IllegalArgumentException] {
+      item = new Item(Item.BACKSTAGE, 10, 51)
+      new GildedRose(Array(item)).updateQuality()
+    }
+  }
 
-    item = new Item(name, 15, 5)
+  test("Sulfuras, Hand of Ragnaros sellIn and quality should stay the same") {
+    item = new Item(Item.SULFURA, 0, 80)
     new GildedRose(Array(item)).updateQuality()
 
-    assert(item.sellIn == 15)
-    assert(item.quality == 5)
+    assert(item.sellIn == 0)
+    assert(item.quality == 80)
   }
 
 }
