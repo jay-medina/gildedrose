@@ -5,6 +5,7 @@ object Item {
   val SULFURA = "Sulfuras, Hand of Ragnaros"
   val AGED_BRIE = "Aged Brie"
   val BACKSTAGE = "Backstage passes to a TAFKAL80ETC concert"
+  val CONJURED = "conjured"
 }
 
 class Item(val name: String, var sellIn: Int, var quality: Int)
@@ -42,6 +43,15 @@ object Update{
 
     if(item.quality > 50) item.quality = 50
   }
+
+  def conjured(item: Item) = {
+    item.sellIn -=1
+
+    if(item.quality > 0) item.quality -= 2
+    if (item.sellIn < 0 && item.quality > 0) item.quality -= 2
+
+    if(item.quality < 0) item.quality = 0
+  }
 }
 
 
@@ -53,6 +63,7 @@ class GildedRose(val items: Array[Item]) {
       case Item.BACKSTAGE => Update backstage item
       case Item.NORMAL => Update normal item
       case Item.SULFURA => Update sulfura item
+      case Item.CONJURED => Update conjured item
       case _ => Update normal item
     })
   }
